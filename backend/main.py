@@ -1,7 +1,6 @@
 from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from fastapi import Depends, FastAPI, Header, HTTPException
 
 from .config import FLAKEGUARD_API_KEY
 from .database import get_db
@@ -23,7 +22,6 @@ class CIResult(BaseModel):
     passed: int
     failed: int
     skipped: int
-FLAKEGUARD_API_KEY = "your-secret-key"
 
 
 def verify_api_key(
@@ -48,20 +46,13 @@ def health():
     return {
         "status": "healthy"
     }
+
+
 @app.post("/api/v1/ci/test-results")
 def receive_ci_results(
     result: CIResult,
     db: Session = Depends(get_db),
     _: None = Depends(verify_api_key),
-):
-    return {
-        "message": "CI result received",
-        "status": "success"
-    }
-@app.post("/api/v1/ci/test-results")
-def receive_ci_results(
-    result: CIResult,
-    db: Session = Depends(get_db),
 ):
     test_run = TestRunModel(
         repository=result.repository,
