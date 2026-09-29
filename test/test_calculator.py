@@ -17,7 +17,6 @@ def test_add_negative_number():
     assert add(-9,-1)==-10
 def test_multiply():
     assert multiply(2,3)==6
-def test_multiply():
-    assert multiply(2,3)==6
+
 
 
