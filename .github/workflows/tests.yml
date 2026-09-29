@@ -38,5 +38,4 @@ jobs:
           FLAKEGUARD_API_URL: ${{ secrets.FLAKEGUARD_API_URL }}
           FLAKEGUARD_API_KEY: ${{ secrets.FLAKEGUARD_API_KEY }}
         run: |
-          python scripts/send_results.py
-          python -m pytest -vv --maxfail=1
+          python scripts/send_results.pyxfail=1
