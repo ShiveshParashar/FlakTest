@@ -31,7 +31,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest \
+          python3 -mpytest \
             --json-report \
             --json-report-file=test-report.json
 
