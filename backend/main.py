@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from .config import FLAKEGUARD_API_KEY
 from .database import get_db
 from .models import TestRun as TestRunModel
+from .database import Base, engine, get_db
 
 
 app = FastAPI(
