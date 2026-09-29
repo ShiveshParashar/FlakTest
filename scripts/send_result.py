@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import time
 from pathlib import Path
 
 import requests
@@ -98,16 +99,28 @@ def send_results(payload):
 
     print(f"Sending results to: {url}")
 
-    try:
-        response = requests.post(
-            url,
-            json=payload,
-            headers=headers,
-            timeout=30,
-        )
-    except requests.RequestException as exc:
-        print(f"ERROR: Could not connect to FlakeGuard API: {exc}")
-        sys.exit(1)
+    attempts = 3
+    response = None
+
+    for attempt in range(1, attempts + 1):
+        try:
+            response = requests.post(
+                url,
+                json=payload,
+                headers=headers,
+                # Generous timeout: free-tier hosts (e.g. Render) can take
+                # 30-60s to wake up from an idle spin-down on the first hit.
+                timeout=60,
+            )
+            break
+        except requests.RequestException as exc:
+            print(f"Attempt {attempt}/{attempts} failed: {exc}")
+
+            if attempt == attempts:
+                print("ERROR: Could not connect to FlakeGuard API.")
+                sys.exit(1)
+
+            time.sleep(10)
 
     print(f"FlakeGuard API status: {response.status_code}")
 
