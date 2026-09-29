@@ -28,4 +28,15 @@ jobs:
 
       - name: Run tests
         run: |
+          python -m pytest \
+            --json-report \
+            --json-report-file=test-report.json
+
+      - name: Send results to FlakeGuard
+        if: always()
+        env:
+          FLAKEGUARD_API_URL: ${{ secrets.FLAKEGUARD_API_URL }}
+          FLAKEGUARD_API_KEY: ${{ secrets.FLAKEGUARD_API_KEY }}
+        run: |
+          python scripts/send_results.py
           python -m pytest -vv --maxfail=1
