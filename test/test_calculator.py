@@ -18,4 +18,4 @@ def test_add_negative_number():
 def test_multiply():
     assert multiply(2,3)==6
 def test_multiply():
-    assert multiply(2,3)==5
+    assert multiply(2,3)==6
