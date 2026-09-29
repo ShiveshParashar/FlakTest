@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: flakeguard
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: FLAKEGUARD_API_KEY
+        sync: false
