@@ -13,31 +13,34 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      # 3. Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
+      # 4. Run pytest and generate JSON report
       - name: Run tests
         run: |
           python -m pytest \
             --json-report \
             --json-report-file=test-report.json
 
+      # 5. Send test results to FlakeGuard API
       - name: Send results to FlakeGuard
         if: always()
         env:
           FLAKEGUARD_API_URL: ${{ secrets.FLAKEGUARD_API_URL }}
           FLAKEGUARD_API_KEY: ${{ secrets.FLAKEGUARD_API_KEY }}
-      - name: Send results to FlakeGuard
-        run: python scripts/send_results.py
-        env:
-          XFAIL: "1"
+        run: |
+          python scripts/send_results.py
