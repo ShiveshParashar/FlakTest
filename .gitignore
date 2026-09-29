@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+
+venvflake/
+.venv/
+venv/
+
+.pytest_cache/
+test-report.json
+
+.env
+*.egg-info/
+dump.rdb

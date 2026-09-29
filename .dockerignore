@@ -1,0 +1,7 @@
+venvflake/
+.git/
+.pytest_cache/
+__pycache__/
+*.pyc
+test-report.json
+.env

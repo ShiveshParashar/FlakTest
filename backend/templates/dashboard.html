@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FlakeGuard Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --card: #ffffff;
+      --border: #e5e5e8;
+      --text: #1a1a1e;
+      --muted: #6b6b74;
+      --accent: #d64545;
+      --accent-soft: #fbeaea;
+      --ok: #2f9e5c;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #17171a;
+        --card: #1f1f23;
+        --border: #2c2c31;
+        --text: #ececef;
+        --muted: #9a9aa2;
+        --accent: #ef6a6a;
+        --accent-soft: #3a2323;
+        --ok: #4cc383;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 16px;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    .sub { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
+    form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    input[type="text"] {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 14px;
+      flex: 1;
+      min-width: 180px;
+    }
+    button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: var(--text);
+      color: var(--bg);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    canvas { max-height: 260px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; }
+    .rate {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .empty { color: var(--muted); text-align: center; padding: 24px 0; }
+    code { font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>FlakeGuard</h1>
+    <p class="sub">Tests whose outcome flips between passed and failed across recent runs.</p>
+
+    <form method="get" action="/dashboard">
+      <input type="text" name="repository" placeholder="Filter by repository (e.g. acme/repo)"
+             value="{{ repository or '' }}">
+      <button type="submit">Filter</button>
+    </form>
+
+    {% if flaky_tests %}
+    <div class="card">
+      <canvas id="flakeChart"></canvas>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Repository</th>
+            <th>Test</th>
+            <th>Runs</th>
+            <th>Passed</th>
+            <th>Failed</th>
+            <th>Flake rate</th>
+            <th>Last seen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in flaky_tests %}
+          <tr>
+            <td>{{ t.repository }}</td>
+            <td><code>{{ t.test_name }}</code></td>
+            <td>{{ t.total_runs }}</td>
+            <td>{{ t.passed }}</td>
+            <td>{{ t.failed }}</td>
+            <td><span class="rate">{{ (t.flake_rate * 100) | round(1) }}%</span></td>
+            <td>{{ t.last_seen }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="card empty">No flaky tests detected{% if repository %} for <code>{{ repository }}</code>{% endif %}. 🎉</div>
+    {% endif %}
+  </div>
+
+  <script>
+    const labels = {{ labels | tojson }};
+    const rates = {{ rates | tojson }};
+
+    if (labels.length) {
+      const ctx = document.getElementById('flakeChart');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Flake rate (%)',
+            data: rates,
+            backgroundColor: '#d64545',
+            borderRadius: 4,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, max: 100 } },
+        },
+      });
+    }
+  </script>
+</body>
+</html>

@@ -38,6 +38,24 @@ def get_summary(report):
     }
 
 
+def get_test_results(report):
+    test_results = []
+
+    for test in report.get("tests", []):
+        call = test.get("call", test.get("setup", {}))
+
+        error_message = call.get("longrepr")
+
+        test_results.append({
+            "test_name": test.get("nodeid", "unknown"),
+            "outcome": test.get("outcome", "unknown"),
+            "duration": call.get("duration", 0.0),
+            "error_message": str(error_message) if error_message else None,
+        })
+
+    return test_results
+
+
 def build_payload(report):
     summary = get_summary(report)
 
@@ -58,6 +76,7 @@ def build_payload(report):
         "passed": summary["passed"],
         "failed": summary["failed"],
         "skipped": summary["skipped"],
+        "test_results": get_test_results(report),
     }
 
 
