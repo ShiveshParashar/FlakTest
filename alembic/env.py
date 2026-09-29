@@ -1,3 +1,4 @@
+
 from logging.config import fileConfig
 import os
 
@@ -9,22 +10,32 @@ from alembic import context
 from backend.database import Base
 from backend import models
 
+
+# Alembic Config object
 config = context.config
 
+
+# Configure logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+
+# SQLAlchemy metadata for Alembic autogenerate
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    url = os.getenv("DATABASE_URL")
+    """Run migrations in offline mode."""
 
-    if not url:
-        raise RuntimeError("DATABASE_URL environment variable is not set")
+    database_url = os.getenv("DATABASE_URL")
+
+    if not database_url:
+        raise RuntimeError(
+            "DATABASE_URL environment variable is not set"
+        )
 
     context.configure(
-        url=url,
+        url=database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -35,10 +46,14 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
+    """Run migrations in online mode."""
+
     database_url = os.getenv("DATABASE_URL")
 
     if not database_url:
-        raise RuntimeError("DATABASE_URL environment variable is not set")
+        raise RuntimeError(
+            "DATABASE_URL environment variable is not set"
+        )
 
     configuration = config.get_section(
         config.config_ini_section,
