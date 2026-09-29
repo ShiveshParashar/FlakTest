@@ -10,6 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout repository
@@ -22,8 +23,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: Show Python version
+        run: |
+          python --version
+          python -m pytest --version
 
       - name: Run tests
         run: |
-          pytest
+          python -m pytest -vv --maxfail=1
