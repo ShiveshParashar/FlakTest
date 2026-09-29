@@ -28,3 +28,10 @@ typing_extensions==4.16.0
 urllib3==2.8.0
 uvicorn==0.54.0
 psycopg2-binary
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+requests
+pytest
+pytest-json-report
