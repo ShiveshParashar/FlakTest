@@ -13,34 +13,51 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      # 3. Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pip install pytest pytest-json-report requests
 
-      # 4. Run pytest and generate JSON report
       - name: Run tests
         run: |
-          python -m pytest \
+          pytest \
             --json-report \
             --json-report-file=test-report.json
 
-      # 5. Send test results to FlakeGuard API
+      - name: Display test report
+        if: always()
+        run: |
+          echo "===== Test Report ====="
+          if [ -f test-report.json ]; then
+            python -m json.tool test-report.json
+          else
+            echo "test-report.json was not created"
+          fi
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test-report.json
+          if-no-files-found: warn
+
       - name: Send results to FlakeGuard
         if: always()
-        env:
-          FLAKEGUARD_API_URL: ${{ secrets.FLAKEGUARD_API_URL }}
-          FLAKEGUARD_API_KEY: ${{ secrets.FLAKEGUARD_API_KEY }}
         run: |
           python scripts/send_result.py
+        env:
+          FLAKEGUARD_API_URL: ${{ secrets.FLAKEGUARD_API_URL }}
+          FLAKEGUARD_API_SECRET: ${{ secrets.FLAKEGUARD_API_SECRET }}
+          TEST_REPORT_FILE: test-report.json
