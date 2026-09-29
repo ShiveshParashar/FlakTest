@@ -27,7 +27,7 @@ class CIResult(BaseModel):
 def verify_api_key(
     x_api_key: str = Header(default=None),
 ):
-    if x_api_key != FLAKEGUARD_API_KEY:
+    if not x_api_key or x_api_key != FLAKEGUARD_API_KEY:
         raise HTTPException(
             status_code=401,
             detail="Invalid API key",

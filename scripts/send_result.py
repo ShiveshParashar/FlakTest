@@ -11,7 +11,7 @@ REPORT_FILE = Path(
 )
 
 API_URL = os.getenv("FLAKEGUARD_API_URL")
-API_SECRET = os.getenv("FLAKEGUARD_API_KEY")
+API_KEY = os.getenv("FLAKEGUARD_API_KEY")
 
 
 def load_report():
@@ -66,15 +66,15 @@ def send_results(payload):
         print("ERROR: FLAKEGUARD_API_URL is not set.")
         sys.exit(1)
 
-    if not API_SECRET:
-        print("ERROR: FLAKEGUARD_API_SECRET is not set.")
+    if not API_KEY:
+        print("ERROR: FLAKEGUARD_API_KEY is not set.")
         sys.exit(1)
 
     url = API_URL.rstrip("/") + "/api/v1/ci/test-results"
 
     headers = {
         "Content-Type": "application/json",
-        "X-API-Key": API_SECRET,
+        "X-API-Key": API_KEY,
     }
 
     print(f"Sending results to: {url}")
