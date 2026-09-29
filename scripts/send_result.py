@@ -11,7 +11,7 @@ REPORT_FILE = Path(
 )
 
 API_URL = os.getenv("FLAKEGUARD_API_URL")
-API_SECRET = os.getenv("FLAKEGUARD_API_SECRET")
+API_SECRET = os.getenv("FLAKEGUARD_API_KEY")
 
 
 def load_report():
