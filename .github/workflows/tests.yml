@@ -37,5 +37,7 @@ jobs:
         env:
           FLAKEGUARD_API_URL: ${{ secrets.FLAKEGUARD_API_URL }}
           FLAKEGUARD_API_KEY: ${{ secrets.FLAKEGUARD_API_KEY }}
-        run: |
-          python scripts/send_results.pyxfail=1
+      - name: Send results to FlakeGuard
+        run: python scripts/send_results.py
+        env:
+          XFAIL: "1"
